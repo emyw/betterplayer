@@ -359,7 +359,8 @@ class _BetterPlayerMaterialControlsState
   }
 
   Widget _buildHitArea() {
-    if (!betterPlayerController!.controlsEnabled) {
+    if (!betterPlayerController!.controlsEnabled ||
+        !_controlsConfiguration.enablePlaybackButtons) {
       return const SizedBox();
     }
     return Container(

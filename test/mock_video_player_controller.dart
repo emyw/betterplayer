@@ -1,3 +1,4 @@
+import 'package:better_player/better_player.dart';
 import 'package:better_player/src/video_player/video_player.dart';
 import 'package:better_player/src/video_player/video_player_platform_interface.dart';
 
@@ -56,6 +57,7 @@ class MockVideoPlayerController extends VideoPlayerController {
   @override
   Future<void> setNetworkDataSource(
     String dataSource, {
+    BetterPlayerDrmType? drmType,
     VideoFormat? formatHint,
     Map<String, String?>? headers,
     bool useCache = false,

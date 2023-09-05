@@ -8,6 +8,7 @@ import 'package:better_player/src/subtitles/better_player_subtitles_factory.dart
 import 'package:better_player/src/video_player/video_player.dart';
 import 'package:better_player/src/video_player/video_player_platform_interface.dart';
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -299,10 +300,10 @@ class BetterPlayerController {
   ///Configure HLS / DASH data source based on provided data source and configuration.
   ///This method configures tracks, subtitles and audio tracks from given
   ///master playlist.
-  Future _setupAsmsDataSource(BetterPlayerDataSource source) async {
-    final String? data = await BetterPlayerAsmsUtils.getDataFromUrl(
+  Future<void> _setupAsmsDataSource(BetterPlayerDataSource source) async {
+    final String? data = await BetterPlayerUtils.getDataFromUrl(
       betterPlayerDataSource!.url,
-      _getHeaders(),
+      headers: _getHeaders(),
     );
     if (data != null) {
       final BetterPlayerAsmsDataHolder _response =
@@ -462,6 +463,7 @@ class BetterPlayerController {
               ?.notificationConfiguration?.notificationChannelName,
           overriddenDuration: _betterPlayerDataSource!.overriddenDuration,
           formatHint: _getVideoFormat(_betterPlayerDataSource!.videoFormat),
+          drmType: _betterPlayerDataSource?.drmConfiguration?.drmType,
           licenseUrl: _betterPlayerDataSource?.drmConfiguration?.licenseUrl,
           certificateUrl:
               _betterPlayerDataSource?.drmConfiguration?.certificateUrl,
@@ -474,28 +476,47 @@ class BetterPlayerController {
 
         break;
       case BetterPlayerDataSourceType.file:
-        final file = File(betterPlayerDataSource.url);
-        if (!file.existsSync()) {
-          BetterPlayerUtils.log(
-              "File ${file.path} doesn't exists. This may be because "
-              "you're acessing file from native path and Flutter doesn't "
-              "recognize this path.");
-        }
+        if (kIsWeb) {
+          // Assume the file is an asset
+          await videoPlayerController?.setAssetDataSource(
+              betterPlayerDataSource.url,
+              showNotification: _betterPlayerDataSource
+                  ?.notificationConfiguration?.showNotification,
+              title: _betterPlayerDataSource?.notificationConfiguration?.title,
+              author:
+                  _betterPlayerDataSource?.notificationConfiguration?.author,
+              imageUrl:
+                  _betterPlayerDataSource?.notificationConfiguration?.imageUrl,
+              notificationChannelName: _betterPlayerDataSource
+                  ?.notificationConfiguration?.notificationChannelName,
+              overriddenDuration: _betterPlayerDataSource!.overriddenDuration,
+              activityName: _betterPlayerDataSource
+                  ?.notificationConfiguration?.activityName);
+        } else {
+          final file = File(betterPlayerDataSource.url);
+          if (!file.existsSync()) {
+            BetterPlayerUtils.log(
+                "File ${file.path} doesn't exists. This may be because "
+                "you're acessing file from native path and Flutter doesn't "
+                "recognize this path.");
+          }
 
-        await videoPlayerController?.setFileDataSource(
-            File(betterPlayerDataSource.url),
-            showNotification: _betterPlayerDataSource
-                ?.notificationConfiguration?.showNotification,
-            title: _betterPlayerDataSource?.notificationConfiguration?.title,
-            author: _betterPlayerDataSource?.notificationConfiguration?.author,
-            imageUrl:
-                _betterPlayerDataSource?.notificationConfiguration?.imageUrl,
-            notificationChannelName: _betterPlayerDataSource
-                ?.notificationConfiguration?.notificationChannelName,
-            overriddenDuration: _betterPlayerDataSource!.overriddenDuration,
-            activityName: _betterPlayerDataSource
-                ?.notificationConfiguration?.activityName,
-            clearKey: _betterPlayerDataSource?.drmConfiguration?.clearKey);
+          await videoPlayerController?.setFileDataSource(
+              File(betterPlayerDataSource.url),
+              showNotification: _betterPlayerDataSource
+                  ?.notificationConfiguration?.showNotification,
+              title: _betterPlayerDataSource?.notificationConfiguration?.title,
+              author:
+                  _betterPlayerDataSource?.notificationConfiguration?.author,
+              imageUrl:
+                  _betterPlayerDataSource?.notificationConfiguration?.imageUrl,
+              notificationChannelName: _betterPlayerDataSource
+                  ?.notificationConfiguration?.notificationChannelName,
+              overriddenDuration: _betterPlayerDataSource!.overriddenDuration,
+              activityName: _betterPlayerDataSource
+                  ?.notificationConfiguration?.activityName,
+              clearKey: _betterPlayerDataSource?.drmConfiguration?.clearKey);
+        }
         break;
       case BetterPlayerDataSourceType.memory:
         final file = await _createFile(_betterPlayerDataSource!.bytes!,
@@ -1067,7 +1088,7 @@ class BetterPlayerController {
       _wasInFullScreenBeforePiP = _isFullScreen;
       _wasControlsEnabledBeforePiP = _controlsEnabled;
       setControlsEnabled(false);
-      if (Platform.isAndroid) {
+      if (kIsWeb || Platform.isAndroid) {
         _wasInFullScreenBeforePiP = _isFullScreen;
         await videoPlayerController?.enablePictureInPicture(
             left: 0, top: 0, width: 0, height: 0);

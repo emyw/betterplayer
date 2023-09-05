@@ -18,6 +18,13 @@ class _DrmPageState extends State<DrmPage> {
         BetterPlayerConfiguration(
       aspectRatio: 16 / 9,
       fit: BoxFit.contain,
+      controlsConfiguration: BetterPlayerControlsConfiguration(
+        enableProgressText: false,
+        enableFullscreen: false,
+        enableMute: false,
+        enableOverflowMenu: false,
+        enablePlaybackButtons: false,
+      ),
     );
     BetterPlayerDataSource _tokenDataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
@@ -37,7 +44,8 @@ class _DrmPageState extends State<DrmPage> {
       drmConfiguration: BetterPlayerDrmConfiguration(
           drmType: BetterPlayerDrmType.widevine,
           licenseUrl: Constants.widevineLicenseUrl,
-          headers: {"Test": "Test2"}),
+        // headers: {"Test": "Test2"},
+      ),
     );
     _widevineController.setupDataSource(_widevineDataSource);
 

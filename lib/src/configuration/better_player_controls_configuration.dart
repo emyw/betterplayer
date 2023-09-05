@@ -88,6 +88,9 @@ class BetterPlayerControlsConfiguration {
   ///Flag used to show controls on init
   final bool showControlsOnInitialize;
 
+  ///Flag used to show/hide controller playback buttons
+  final bool enablePlaybackButtons;
+
   ///Control bar height
   final double controlBarHeight;
 
@@ -190,6 +193,7 @@ class BetterPlayerControlsConfiguration {
     this.playerTheme,
     this.showControls = true,
     this.showControlsOnInitialize = true,
+    this.enablePlaybackButtons = true,
     this.controlBarHeight = 48.0,
     this.liveTextColor = Colors.red,
     this.enableOverflowMenu = true,

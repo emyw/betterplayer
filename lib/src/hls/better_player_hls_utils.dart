@@ -93,7 +93,7 @@ class BetterPlayerHlsUtils {
     try {
       final HlsPlaylistParser _hlsPlaylistParser = HlsPlaylistParser.create();
       final subtitleData =
-          await BetterPlayerAsmsUtils.getDataFromUrl(rendition.url.toString());
+          await BetterPlayerUtils.getDataFromUrl(rendition.url.toString());
       if (subtitleData == null) {
         return null;
       }

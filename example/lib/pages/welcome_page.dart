@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:better_player_example/constants.dart';
 import 'package:better_player_example/pages/auto_fullscreen_orientation_page.dart';
+import 'package:better_player_example/pages/asset_player_page.dart';
 import 'package:better_player_example/pages/basic_player_page.dart';
 import 'package:better_player_example/pages/cache_page.dart';
 import 'package:better_player_example/pages/clearkey_page.dart';
@@ -29,9 +30,11 @@ import 'package:better_player_example/pages/rotation_and_fit_page.dart';
 import 'package:better_player_example/pages/subtitles_page.dart';
 import 'package:better_player_example/pages/video_list/video_list_page.dart';
 import 'package:better_player_example/pages/picture_in_picture_page.dart';
+import 'package:better_player_example/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -41,10 +44,12 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
-    _saveAssetSubtitleToFile();
-    _saveAssetVideoToFile();
-    _saveAssetEncryptVideoToFile();
-    _saveLogoToFile();
+    if (!kIsWeb) {
+      _saveAssetSubtitleToFile();
+      _saveAssetVideoToFile();
+      _saveAssetEncryptVideoToFile();
+      _saveLogoToFile();
+    }
     super.initState();
   }
 
@@ -116,6 +121,9 @@ class _WelcomePageState extends State<WelcomePage> {
       }),
       _buildExampleElementWidget("Rotation and fit", () {
         _navigateToPage(RotationAndFitPage());
+      }),
+      _buildExampleElementWidget("Asset player", () {
+        _navigateToPage(AssetPlayerPage());
       }),
       _buildExampleElementWidget("Memory player", () {
         _navigateToPage(MemoryPlayerPage());
@@ -195,34 +203,36 @@ class _WelcomePageState extends State<WelcomePage> {
 
   ///Save subtitles to file, so we can use it later
   Future _saveAssetSubtitleToFile() async {
-    String content =
-        await rootBundle.loadString("assets/example_subtitles.srt");
-    final directory = await getApplicationDocumentsDirectory();
-    var file = File("${directory.path}/example_subtitles.srt");
+    final fileName = "example_subtitles.srt";
+    final content = await rootBundle.loadString("assets/$fileName");
+    final fileUrl = await Utils.getFileUrl(fileName);
+    final file = File(fileUrl);
     file.writeAsString(content);
   }
 
   ///Save video to file, so we can use it later
   Future _saveAssetVideoToFile() async {
-    var content = await rootBundle.load("assets/testvideo.mp4");
-    final directory = await getApplicationDocumentsDirectory();
-    var file = File("${directory.path}/testvideo.mp4");
+    final fileName = "testvideo.mp4";
+    var content = await rootBundle.load("assets/$fileName");
+    final fileUrl = await Utils.getFileUrl(fileName);
+    final file = File(fileUrl);
     file.writeAsBytesSync(content.buffer.asUint8List());
   }
 
   Future _saveAssetEncryptVideoToFile() async {
-    var content =
-        await rootBundle.load("assets/${Constants.fileTestVideoEncryptUrl}");
-    final directory = await getApplicationDocumentsDirectory();
-    var file = File("${directory.path}/${Constants.fileTestVideoEncryptUrl}");
+    final fileName = Constants.fileTestVideoEncryptUrl;
+    var content = await rootBundle.load("assets/$fileName");
+    final fileUrl = await Utils.getFileUrl(fileName);
+    final file = File(fileUrl);
     file.writeAsBytesSync(content.buffer.asUint8List());
   }
 
   ///Save logo to file, so we can use it later
   Future _saveLogoToFile() async {
-    var content = await rootBundle.load("assets/${Constants.logo}");
-    final directory = await getApplicationDocumentsDirectory();
-    var file = File("${directory.path}/${Constants.logo}");
+    final fileName = Constants.logo;
+    var content = await rootBundle.load("assets/$fileName");
+    final fileUrl = await Utils.getFileUrl(fileName);
+    final file = File(fileUrl);
     file.writeAsBytesSync(content.buffer.asUint8List());
   }
 }

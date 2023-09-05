@@ -6,7 +6,7 @@
 import 'dart:async';
 
 // Flutter imports:
-import 'package:better_player/src/configuration/better_player_buffering_configuration.dart';
+import 'package:better_player/better_player.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'method_channel_video_player.dart';
@@ -221,6 +221,7 @@ class DataSource {
     this.imageUrl,
     this.notificationChannelName,
     this.overriddenDuration,
+    this.drmType,
     this.licenseUrl,
     this.certificateUrl,
     this.drmHeaders,
@@ -292,6 +293,8 @@ class DataSource {
   final String? notificationChannelName;
 
   final Duration? overriddenDuration;
+
+  final BetterPlayerDrmType? drmType;
 
   final String? licenseUrl;
 

@@ -1,8 +1,15 @@
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Utils {
   static Future<String> getFileUrl(String fileName) async {
-    final directory = await getApplicationDocumentsDirectory();
-    return "${directory.path}/$fileName";
+    String path = '';
+    if (kIsWeb) {
+      path = 'assets';
+    } else {
+      final directory = await getApplicationDocumentsDirectory();
+      path = directory.path;
+    }
+    return '$path/$fileName';
   }
 }
